@@ -1,0 +1,22 @@
+[
+  {"id": 1, "query": "What is the termination clause for breach in contract A?", "answer": "The contract allows termination for material breach with 30 days notice.", "context": "Contract A clause: Either party may terminate for material breach after 30 days notice."},
+  {"id": 2, "query": "When does the warranty expire?", "answer": "The warranty expires 12 months after delivery.", "context": "Warranty: effective upon delivery and lasts 12 months."},
+  {"id": 3, "query": "Who bears liability for data loss?", "answer": "The supplier bears liability for data loss up to direct damages limited to fees paid.", "context": "Liability: Supplier liable for direct damages limited to fees paid; no indirect."},
+  {"id": 4, "query": "Is there a force majeure clause?", "answer": "Yes, force majeure suspends obligations for events beyond control.", "context": "Force majeure: suspends obligations during events beyond control."},
+  {"id": 5, "query": "How are disputes resolved?", "answer": "Disputes are resolved by arbitration in New York.", "context": "Governing law and disputes: arbitration in New York."},
+  {"id": 6, "query": "What is the notice period for termination without cause?", "answer": "Termination without cause requires 60 days notice.", "context": "Termination without cause: 60 days notice required."},
+  {"id": 7, "query": "Can subcontractors be used?", "answer": "Yes, subcontractors may be used but the supplier remains liable.", "context": "Subcontracting permitted; supplier remains liable for subcontractor acts."},
+  {"id": 8, "query": "What indemnities are provided?", "answer": "The supplier indemnifies for third-party IP claims and will defend the customer.", "context": "Indemnity: supplier defends and indemnifies against third-party IP claims."},
+  {"id": 9, "query": "Are there export control obligations?", "answer": "Yes, parties must comply with export control laws.", "context": "Export control: compliance required by both parties."},
+  {"id": 10, "query": "What is the governing law?", "answer": "The governing law is the State of Delaware.", "context": "Governing law: State of Delaware."},
+  {"id": 11, "query": "Is personal data processed?", "answer": "Yes, personal data is processed for service delivery under GDPR compliance.", "context": "Personal data processing: yes; parties comply with GDPR."},
+  {"id": 12, "query": "How long are records retained?", "answer": "Records are retained for 7 years after termination.", "context": "Record retention: 7 years post-termination."},
+  {"id": 13, "query": "Does the contract include a confidentiality clause?", "answer": "Yes, confidential information must be kept confidential for 5 years.", "context": "Confidentiality: 5-year obligation post-disclosure."},
+  {"id": 14, "query": "What are payment terms?", "answer": "Payment is due within 30 days of invoice.", "context": "Payment terms: net 30 days from invoice."},
+  {"id": 15, "query": "Are there service level commitments?", "answer": "Yes, 99.9% uptime SLA with credit remedies.", "context": "SLA: 99.9% uptime; credits for downtime."},
+  {"id": 16, "query": "Is there a change-of-control clause?", "answer": "Yes, material change-of-control requires notice and consent.", "context": "Change of control: notice and consent required for material changes."},
+  {"id": 17, "query": "Who owns IP created under the contract?", "answer": "The customer owns IP created specifically for them under the contract.", "context": "IP ownership: Customer owns deliverable-specific IP."},
+  {"id": 18, "query": "What insurance is required?", "answer": "Supplier must maintain general liability insurance of $1,000,000.", "context": "Insurance: general liability minimum $1,000,000."},
+  {"id": 19, "query": "Are assignment rights restricted?", "answer": "Assignment requires prior written consent except to affiliates.", "context": "Assignment: consent required; exception for affiliates."},
+  {"id": 20, "query": "How are amendments handled?", "answer": "Amendments must be in writing and signed by both parties.", "context": "Amendments: in writing and signed by both parties."}
+]

@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "legal-rag"
+version = "0.1.0"
+description = "Multi-tenant legal document RAG system"
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.95.0"
+uvicorn = {extras = ["standard"], version = "^0.22.0"}
+sse-starlette = "^1.0.0"
+langgraph = "*"
+langchain = "*"
+qdrant-client = "*"
+rank-bm25 = "*"
+redis = "*"
+celery = "*"
+pymupdf = "*"
+tiktoken = "*"
+sqlalchemy = "*"
+asyncpg = "*"
+pydantic-settings = "*"
+python-jose = "*"
+passlib = "*"
+prometheus-fastapi-instrumentator = "*"
+structlog = "*"
+pytest = "*"
+pytest-asyncio = "*"
+httpx = "*"
+sentence-transformers = "*"
+groq = "*"
+langchain-groq = "*"
+datasets = "*"
+huggingface_hub = "*"
+
+[build-system]
+requires = ["poetry-core" ]
+build-backend = "poetry.core.masonry.api"
