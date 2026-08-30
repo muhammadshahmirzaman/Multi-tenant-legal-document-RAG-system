@@ -2,9 +2,10 @@ from fastapi import APIRouter
 from app.db.session import engine
 from app.core.config import settings
 import asyncio
+from sqlalchemy import text
 
 try:
-    import aioredis
+    from redis import asyncio as aioredis
 except Exception:
     aioredis = None
 
@@ -21,7 +22,7 @@ async def health():
     # Postgres
     try:
         async with engine.connect() as conn:
-            await conn.execute("SELECT 1")
+            await conn.execute(text("SELECT 1"))
         status["components"]["postgres"] = "ok"
     except Exception as e:
         status["components"]["postgres"] = f"error: {e}"

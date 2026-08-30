@@ -36,6 +36,45 @@ class BM25Store:
                 out.append({"id": doc.get("id"), "doc_id": doc.get("doc_id"), "page": doc.get("page"), "chunk_text": doc.get("chunk_text"), "score": float(scores[i])})
             return out
 
+    def build_from_qdrant(self, tenant_id: str, qdrant_client, limit: int = 10000):
+        """Build BM25 index by fetching documents from Qdrant for a tenant."""
+        try:
+            from qdrant_client.http.models import Filter, FieldCondition, MatchValue
+            f = Filter(must=[FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id))])
+            # Scroll through all points for this tenant
+            docs = []
+            offset = None
+            while True:
+                res = qdrant_client.client.scroll(
+                    collection_name=qdrant_client.collection,
+                    scroll_filter=f,
+                    limit=min(100, limit - len(docs)) if limit else 100,
+                    offset=offset,
+                    with_payload=True,
+                    with_vectors=False
+                )
+                points, next_offset = res
+                for point in points:
+                    payload = point.payload
+                    docs.append({
+                        "id": str(point.id),
+                        "doc_id": payload.get("doc_id"),
+                        "page": payload.get("page"),
+                        "chunk_text": payload.get("chunk_text", "")
+                    })
+                    if limit and len(docs) >= limit:
+                        break
+                if not next_offset or (limit and len(docs) >= limit):
+                    break
+                offset = next_offset
+            
+            if docs:
+                self.build(tenant_id, docs)
+                return len(docs)
+        except Exception as e:
+            print(f"Failed to build BM25 from Qdrant for tenant {tenant_id}: {e}")
+        return 0
+
 
 # Singleton
 store = BM25Store()

@@ -2,7 +2,7 @@ from typing import List
 from app.core.config import settings
 
 try:
-    import aioredis
+    from redis import asyncio as aioredis
     HAS_REDIS = True
 except Exception:
     aioredis = None

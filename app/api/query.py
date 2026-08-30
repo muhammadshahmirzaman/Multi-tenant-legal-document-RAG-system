@@ -29,7 +29,7 @@ async def query(req: QueryRequest, tenant_id: str = Depends(get_current_tenant))
         hist = await get_history(req.session_id)
         if hist:
             state["history"] = hist
-    final = await graph.graph.run(state)
+    final = await graph.run(state)
     # push last answer to session
     if req.session_id:
         await push_message(req.session_id, final.get("answer", ""))

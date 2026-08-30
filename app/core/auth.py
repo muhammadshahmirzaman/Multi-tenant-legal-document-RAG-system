@@ -3,7 +3,7 @@ from jose import jwt, JWTError
 from typing import Optional
 from app.core.config import settings
 from passlib.context import CryptContext
-import aioredis
+from redis import asyncio as aioredis
 from app.db.session import AsyncSessionLocal
 from sqlalchemy.future import select
 from app.db.models import Tenant

@@ -25,3 +25,4 @@ httpx
 datasets
 ragas
 huggingface_hub
+python-multipart

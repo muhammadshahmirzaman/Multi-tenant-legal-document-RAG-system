@@ -4,7 +4,7 @@ from app.core.config import settings
 import asyncio
 
 try:
-    import aioredis
+    from redis import asyncio as aioredis
     HAS_REDIS = True
 except Exception:
     aioredis = None

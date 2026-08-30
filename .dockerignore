@@ -1,0 +1,15 @@
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.git
+.idea
+*.md
+# *.txt - keep requirements.txt
+data/
+tests/
+evals/
+*.pyc
+*.pyo
+*.pyd
+.env

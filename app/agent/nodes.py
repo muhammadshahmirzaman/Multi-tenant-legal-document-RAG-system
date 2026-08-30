@@ -1,7 +1,8 @@
 from typing import List, cast
 from .state import AgentState
-from app.retrieval.bm25 import BM25Store
-from app.retrieval.qdrant_client import QdrantClient
+from app.retrieval.bm25 import store as bm25_store
+from app.retrieval.qdrant_client import client as qdrant_client
+from app.retrieval.reranker import cohere_rerank
 from app.agent.tools import clause_extractor, doc_compare, statute_lookup
 from app.core.config import settings
 import time
@@ -13,11 +14,6 @@ try:
 except Exception:
     ChatGroq = None
     HAS_GROQ = False
-
-
-# Simple in-process singletons for retrievers
-bm25_store = BM25Store()
-qdrant_client = QdrantClient()
 
 
 class _FallbackLLM:
@@ -67,7 +63,9 @@ async def retriever(state: AgentState) -> AgentState:
         bm25_hits = bm25_store.search(state.get("tenant_id", "default"), s, top_n=20)
         dense_hits = qdrant_client.search(s, tenant_id=state.get("tenant_id", "default"), top=20)
         combined = {h.get("id") or h.get("doc_id"): h for h in (bm25_hits + dense_hits) if h}
-        hits = list(combined.values())[:5]
+        hits = list(combined.values())[:20]  # Get more candidates for reranking
+        # Rerank the combined hits
+        hits = cohere_rerank(s, hits, top_k=5)
         retrieved.extend(hits)
     state["retrieved_chunks"] = retrieved
     state["retrieval_ms"] = int((time.time() - start) * 1000)

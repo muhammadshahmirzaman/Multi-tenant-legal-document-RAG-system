@@ -5,6 +5,7 @@ import time
 from typing import List
 from app.workers.celery_app import celery
 from app.retrieval.qdrant_client import client as qdrant_client
+from app.retrieval.bm25 import store as bm25_store
 from app.db.session import AsyncSessionLocal
 from app.db.models import Document
 from app.cache.semantic_cache import flush_tenant_cache
@@ -66,6 +67,8 @@ def ingest_pdf(file_path: str, tenant_id: str, filename: str):
     for i, v in enumerate(vectors):
         pts.append({"id": chunks[i]["doc_id"], "vector": v, "payload": {"tenant_id": tenant_id, "doc_id": chunks[i]["doc_id"], "page": chunks[i]["page"], "chunk_index": i, "chunk_text": chunks[i]["chunk_text"], "filename": filename}})
     upserted = qdrant_client.upsert(pts)
+    # Build BM25 index for this tenant
+    bm25_store.build(tenant_id, chunks)
     # insert document record
     async def _insert_doc():
         async with AsyncSessionLocal() as session:
@@ -115,6 +118,9 @@ def ingest_text(file_path: str, tenant_id: str, filename: str):
         })
 
     upserted = qdrant_client.upsert(pts)
+
+    # Build BM25 index for this tenant
+    bm25_store.build(tenant_id, chunks)
 
     # insert document record
     async def _insert_doc():

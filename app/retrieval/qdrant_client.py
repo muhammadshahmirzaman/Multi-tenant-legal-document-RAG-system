@@ -3,7 +3,7 @@ from app.core.config import settings
 
 try:
     from qdrant_client import QdrantClient as _Qdrant
-    from qdrant_client.http.models import VectorParams, Filter, FieldCondition, MatchValue
+    from qdrant_client.http.models import VectorParams, Distance, Filter, FieldCondition, MatchValue
     HAS_QDRANT = True
 except Exception:
     _Qdrant = None
@@ -21,8 +21,12 @@ class QdrantClient:
                 try:
                     self.client.get_collection(self.collection)
                 except Exception:
-                    self.client.recreate_collection(collection_name=self.collection, vectors=VectorParams(size=384, distance="Cosine"))
-            except Exception:
+                    self.client.create_collection(
+                        collection_name=self.collection,
+                        vectors_config=VectorParams(size=384, distance=Distance.COSINE)
+                    )
+            except Exception as e:
+                print(f"Qdrant client initialization failed: {e}")
                 self.client = None
 
     def upsert(self, vectors: List[Dict[str, Any]]):
