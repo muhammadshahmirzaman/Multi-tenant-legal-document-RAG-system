@@ -50,12 +50,20 @@ jobs:
           poetry config virtualenvs.create false
           poetry install --no-interaction
 
+      - name: Populate eval tenant data
+        run: python scripts/populate_eval_data.py
+        env:
+          QDRANT_URL: http://localhost:6333
+          REDIS_URL: redis://localhost:6379/0
+          EMBEDDING_MODEL: all-MiniLM-L6-v2
+
       - name: Run evaluation
         run: python evals/run_evals.py
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           QDRANT_URL: http://localhost:6333
           REDIS_URL: redis://localhost:6379/0
+          EMBEDDING_MODEL: all-MiniLM-L6-v2
 
       - name: Upload evaluation results
         if: always()
