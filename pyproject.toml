@@ -35,6 +35,23 @@ huggingface_hub = "*"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+python_files = ["test_*.py", "*_test.py"]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-v --strict-markers"
+markers = [
+    "integration: marks tests as integration tests (require external services)",
+    "unit: marks tests as unit tests (no external dependencies)",
+    "slow: marks tests as slow running",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:fastapi.*",
+    "ignore::DeprecationWarning:starlette.*",
+]
+
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "*"
+pytest-mock = "*"
 
 [build-system]
 requires = ["poetry-core" ]
