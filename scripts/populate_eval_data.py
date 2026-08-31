@@ -53,7 +53,8 @@ def main():
         })
 
     print("Upserting to Qdrant...")
-    qdrant_client.upsert(pts)
+    if not qdrant_client.upsert(pts):
+        raise RuntimeError("Failed to upsert eval data to Qdrant; is QDRANT_URL reachable?")
 
     print("Building BM25 index...")
     bm25_store.build(EVAL_TENANT, docs)
