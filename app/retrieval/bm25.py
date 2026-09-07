@@ -39,6 +39,9 @@ class BM25Store:
     def build_from_qdrant(self, tenant_id: str, qdrant_client, limit: int = 10000):
         """Build BM25 index by fetching documents from Qdrant for a tenant."""
         try:
+            qdrant_client._ensure_initialized()
+            if not qdrant_client.client:
+                return 0
             from qdrant_client.http.models import Filter, FieldCondition, MatchValue
             f = Filter(must=[FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id))])
             # Scroll through all points for this tenant

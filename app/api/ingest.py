@@ -3,6 +3,7 @@ from uuid import uuid4
 import os
 from app.core.auth import get_current_tenant
 from app.workers.ingest_task import ingest_pdf
+from app.workers.celery_app import celery
 from celery.result import AsyncResult
 from app.core.config import settings
 
@@ -27,6 +28,5 @@ async def ingest(file: UploadFile = File(...), tenant_id: str = Depends(get_curr
 
 @router.get("/status/{task_id}")
 async def status(task_id: str):
-    res = AsyncResult(task_id, app=None)
-    # AsyncResult requires an app; relying on default celery backend configured
-    return {"task_id": task_id, "status": res.status, "result": res.result}
+    res = AsyncResult(task_id, app=celery)
+    return {"task_id": task_id, "status": res.status, "result": str(res.result) if isinstance(res.result, Exception) else res.result}

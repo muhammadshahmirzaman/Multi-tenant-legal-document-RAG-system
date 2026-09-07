@@ -5,7 +5,9 @@ from app.core.config import settings
 import asyncio
 from contextlib import asynccontextmanager
 
-engine = create_async_engine(settings.POSTGRES_URL, connect_args={"ssl": False}, future=True, echo=False)
+from sqlalchemy.pool import NullPool
+
+engine = create_async_engine(settings.POSTGRES_URL, connect_args={"ssl": False}, poolclass=NullPool, future=True, echo=False)
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 async def get_session() -> AsyncSession:

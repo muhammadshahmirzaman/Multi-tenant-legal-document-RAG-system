@@ -17,29 +17,36 @@ REDIS_URL = env.get('REDIS_URL')
 QDRANT_URL = env.get('QDRANT_URL')
 GROQ_API_KEY = env.get('GROQ_API_KEY')
 
+import sys
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 print('ENV validation:')
 if POSTGRES_URL and POSTGRES_URL.startswith('postgresql+asyncpg://'):
     if '?ssl' in POSTGRES_URL or 'sslmode' in POSTGRES_URL:
-        print('❌ POSTGRES_URL contains ssl parameters — remove them and use connect_args')
+        print('[FAIL] POSTGRES_URL contains ssl parameters — remove them and use connect_args')
     else:
-        print('✅ POSTGRES_URL format OK')
+        print('[OK] POSTGRES_URL format OK')
 else:
-    print('❌ POSTGRES_URL missing or wrong prefix')
+    print('[FAIL] POSTGRES_URL missing or wrong prefix')
 
 if REDIS_URL and REDIS_URL.startswith('redis://'):
-    print('✅ REDIS_URL format OK')
+    print('[OK] REDIS_URL format OK')
 else:
-    print('❌ REDIS_URL missing or invalid')
+    print('[FAIL] REDIS_URL missing or invalid')
 
 if QDRANT_URL and QDRANT_URL.startswith('http://'):
-    print('✅ QDRANT_URL format OK')
+    print('[OK] QDRANT_URL format OK')
 else:
-    print('❌ QDRANT_URL missing or invalid')
+    print('[FAIL] QDRANT_URL missing or invalid')
 
 if GROQ_API_KEY and not GROQ_API_KEY.lower().startswith('your_'):
-    print('✅ GROQ_API_KEY present')
+    print('[OK] GROQ_API_KEY present')
 else:
-    print('❌ GROQ_API_KEY missing or placeholder')
+    print('[FAIL] GROQ_API_KEY missing or placeholder')
 
 
 async def check_postgres():
@@ -53,9 +60,9 @@ async def check_postgres():
         db = p.path.lstrip('/') or 'postgres'
         conn = await asyncpg.connect(host=host, port=port, user=user, password=password, database=db, ssl=False)
         await conn.close()
-        print('✅ Postgres reachable')
+        print('[OK] Postgres reachable')
     except Exception as e:
-        print('❌ Postgres not reachable — reason:', e)
+        print('[FAIL] Postgres not reachable — reason:', e)
 
 async def main():
     await check_postgres()
@@ -64,20 +71,20 @@ async def main():
         import redis
         r = redis.from_url(REDIS_URL) if REDIS_URL else redis.Redis()
         r.ping()
-        print('✅ Redis reachable')
+        print('[OK] Redis reachable')
     except Exception as e:
-        print('❌ Redis not reachable — reason:', e)
+        print('[FAIL] Redis not reachable — reason:', e)
     # Qdrant
     try:
         import requests
-        url = QDRANT_URL.rstrip('/') + '/healthz'
+        url = QDRANT_URL.rstrip('/') + '/'
         resp = requests.get(url, timeout=5)
         if resp.status_code in (200,204):
-            print('✅ Qdrant reachable')
+            print('[OK] Qdrant reachable')
         else:
-            print('❌ Qdrant not reachable — status', resp.status_code)
+            print('[FAIL] Qdrant not reachable — status', resp.status_code)
     except Exception as e:
-        print('❌ Qdrant not reachable — reason:', e)
+        print('[FAIL] Qdrant not reachable — reason:', e)
 
 if __name__ == '__main__':
     asyncio.run(main())

@@ -9,11 +9,24 @@ except Exception:
     HAS_CE = False
 
 
+_CROSS_ENCODER_MODEL = None
+
+
+def _get_cross_encoder():
+    global _CROSS_ENCODER_MODEL
+    if HAS_CE and _CROSS_ENCODER_MODEL is None:
+        try:
+            _CROSS_ENCODER_MODEL = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+        except Exception:
+            _CROSS_ENCODER_MODEL = False
+    return _CROSS_ENCODER_MODEL if _CROSS_ENCODER_MODEL is not False else None
+
+
 def cohere_rerank(query: str, candidates: List[Dict[str, Any]], top_k: int = 5) -> List[Dict[str, Any]]:
     # Rename kept for compatibility; use CrossEncoder if available
-    if HAS_CE:
+    model = _get_cross_encoder()
+    if model is not None and candidates:
         try:
-            model = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
             texts = [c.get("chunk_text", "") for c in candidates]
             pairs = [[query, t] for t in texts]
             scores = model.predict(pairs)

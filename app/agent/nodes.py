@@ -93,11 +93,17 @@ async def tool_dispatcher(state: AgentState) -> AgentState:
 async def generator(state: AgentState) -> AgentState:
     start = time.time()
     chunks = state.get("retrieved_chunks", [])[:5]
-    chunks_text = "\n\n".join([f"[{c.get('doc_id')} p.{c.get('page',0)}] {c.get('chunk_text')}" for c in chunks])
+    chunks_text = "\n\n".join([f"[{c.get('doc_id')} p.{c.get('page',0)}] {str(c.get('chunk_text', ''))[:500]}" for c in chunks])
     tools_text = "\n".join([f"{k}: {v}" for k, v in state.get("tool_results", {}).items()])
     prompt = f"Query: {state.get('query')}\n\nChunks:\n{chunks_text}\n\nTools:\n{tools_text}\n\nAnswer:"
-    res = await llm.ainvoke(prompt)
-    answer = getattr(res, 'content', str(res))
+    try:
+        res = await llm.ainvoke(prompt)
+        answer = getattr(res, 'content', str(res))
+    except Exception as e:
+        print(f"Primary LLM call failed ({e}), using fallback LLM")
+        fallback = _FallbackLLM()
+        res = await fallback.ainvoke(prompt)
+        answer = getattr(res, 'content', str(res))
     state["answer"] = answer
     state["citations"] = [{"doc_id": c.get("doc_id"), "page": c.get("page"), "chunk_text": c.get("chunk_text")} for c in chunks]
     state["llm_ms"] = int((time.time() - start) * 1000)

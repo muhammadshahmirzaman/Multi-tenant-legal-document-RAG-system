@@ -44,6 +44,23 @@ def embed_texts(texts: List[str]) -> List[List[float]]:
     return [[0.0]*384 for _ in texts]
 
 
+def _run_coro(coro):
+    import asyncio
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    if loop.is_running():
+        return asyncio.create_task(coro)
+    else:
+        return loop.run_until_complete(coro)
+
+
 @celery.task(name="ingest_pdf")
 def ingest_pdf(file_path: str, tenant_id: str, filename: str):
     start = time.time()
@@ -76,14 +93,12 @@ def ingest_pdf(file_path: str, tenant_id: str, filename: str):
             session.add(doc_record)
             await session.commit()
     try:
-        import asyncio
-        asyncio.run(_insert_doc())
+        _run_coro(_insert_doc())
     except Exception:
         pass
     # flush cache
     try:
-        import asyncio
-        asyncio.run(flush_tenant_cache(tenant_id))
+        _run_coro(flush_tenant_cache(tenant_id))
     except Exception:
         pass
     return {"status": "success", "chunks": len(chunks), "upserted": bool(upserted), "duration_s": time.time()-start}
@@ -129,15 +144,13 @@ def ingest_text(file_path: str, tenant_id: str, filename: str):
             session.add(doc_record)
             await session.commit()
     try:
-        import asyncio
-        asyncio.run(_insert_doc())
+        _run_coro(_insert_doc())
     except Exception:
         pass
 
     # flush cache
     try:
-        import asyncio
-        asyncio.run(flush_tenant_cache(tenant_id))
+        _run_coro(flush_tenant_cache(tenant_id))
     except Exception:
         pass
 

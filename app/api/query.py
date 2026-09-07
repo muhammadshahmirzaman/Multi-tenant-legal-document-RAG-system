@@ -37,6 +37,9 @@ async def query(req: QueryRequest, tenant_id: str = Depends(get_current_tenant))
     return JSONResponse({"answer": final.get("answer"), "citations": final.get("citations", []), "hallucination_score": final.get("hallucination_score", 0.0), "metrics": {"retrieval_ms": final.get("retrieval_ms"), "llm_ms": final.get("llm_ms"), "duration_s": duration}})
 
 
+import json
+
+
 @router.get("/stream")
 async def stream(request: Request, query: str, session_id: str | None = None, tenant_id: str = Depends(get_current_tenant)):
     async def event_generator():
@@ -50,7 +53,7 @@ async def stream(request: Request, query: str, session_id: str | None = None, te
             s_before = {k: state.get(k) for k in ("intent", "sub_questions", "retrieved_chunks", "tool_results", "answer")}
             state = await fn(state)
             s_after = {k: state.get(k) for k in ("intent", "sub_questions", "retrieved_chunks", "tool_results", "answer")}
-            yield {"type": "step", "content": {"node": fn.__name__, "before": s_before, "after": s_after}}
+            yield {"event": "step", "data": json.dumps({"node": fn.__name__, "before": s_before, "after": s_after})}
             await asyncio.sleep(0.01)
-        yield {"type": "done", "content": {"answer": state.get("answer"), "citations": state.get("citations"), "hallucination_score": state.get("hallucination_score")}}
+        yield {"event": "done", "data": json.dumps({"answer": state.get("answer"), "citations": state.get("citations"), "hallucination_score": state.get("hallucination_score")})}
     return EventSourceResponse(event_generator())
