@@ -20,12 +20,12 @@ async def make_hash(text: str) -> str:
 async def get_cached(tenant_id: str, text: str) -> Optional[Any]:
     if not HAS_REDIS:
         return None
-    key = f"cache:{tenant_id}:{await make_hash(text)}"
-    r = await aioredis.from_url(settings.REDIS_URL)
-    val = await r.get(key)
-    if not val:
-        return None
     try:
+        key = f"cache:{tenant_id}:{await make_hash(text)}"
+        r = await aioredis.from_url(settings.REDIS_URL)
+        val = await r.get(key)
+        if not val:
+            return None
         return json.loads(val)
     except Exception:
         return None
@@ -34,20 +34,26 @@ async def get_cached(tenant_id: str, text: str) -> Optional[Any]:
 async def set_cached(tenant_id: str, text: str, value: Any, ttl: int = 3600):
     if not HAS_REDIS:
         return False
-    key = f"cache:{tenant_id}:{await make_hash(text)}"
-    r = await aioredis.from_url(settings.REDIS_URL)
-    await r.set(key, json.dumps(value), ex=ttl)
-    return True
+    try:
+        key = f"cache:{tenant_id}:{await make_hash(text)}"
+        r = await aioredis.from_url(settings.REDIS_URL)
+        await r.set(key, json.dumps(value), ex=ttl)
+        return True
+    except Exception:
+        return False
 
 
 async def flush_tenant_cache(tenant_id: str):
     if not HAS_REDIS:
         return 0
-    r = await aioredis.from_url(settings.REDIS_URL)
-    cursor = b"0"
-    deleted = 0
-    pattern = f"cache:{tenant_id}:*"
-    async for key in r.scan_iter(match=pattern):
-        await r.delete(key)
-        deleted += 1
-    return deleted
+    try:
+        r = await aioredis.from_url(settings.REDIS_URL)
+        cursor = b"0"
+        deleted = 0
+        pattern = f"cache:{tenant_id}:*"
+        async for key in r.scan_iter(match=pattern):
+            await r.delete(key)
+            deleted += 1
+        return deleted
+    except Exception:
+        return 0

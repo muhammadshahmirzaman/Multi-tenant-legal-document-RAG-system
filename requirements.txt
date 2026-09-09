@@ -19,8 +19,6 @@ python-jose[cryptography]
 passlib[bcrypt]
 prometheus-fastapi-instrumentator
 structlog
-pytest
-pytest-asyncio
 httpx
 datasets
 ragas

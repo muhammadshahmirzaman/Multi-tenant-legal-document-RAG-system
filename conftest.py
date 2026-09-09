@@ -1,9 +1,11 @@
-import pytest
-from fastapi.testclient import TestClient
-from app.main import app
+try:
+    import pytest
+    _HAS_PYTEST = True
+except ImportError:
+    _HAS_PYTEST = False
 
-
-@pytest.fixture(scope="session")
+if _HAS_PYTEST:
+    @pytest.fixture(scope="session")
 def client():
     """FastAPI TestClient for synchronous tests."""
     return TestClient(app)
